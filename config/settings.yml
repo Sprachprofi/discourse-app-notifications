@@ -1,0 +1,6 @@
+plugins:
+  app_notifications_enabled:
+    default: false
+    client: true
+  app_notifications_api_key:
+    default: ''

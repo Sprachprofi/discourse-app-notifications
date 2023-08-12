@@ -1,0 +1,21 @@
+{{#if showAppNotification}}
+  <div class='control-group app-notifications'>
+    <label class="control-label">{{i18n 'discourse_app_notifications.title'}}</label>
+    {{#if errorMessage}}
+      <div class="alert alert-error">{{errorMessage}}</div>
+    {{/if}}
+    <div class="controls">
+      <div>
+        {{#if appNotificationSubscribed}}
+          {{d-button icon="bell-slash-o" label="discourse_app_notifications.disable" action=(action "unsubscribe") disabled=loading}}
+        {{conditional-loading-spinner size="small" condition=loading}}
+        {{else}}
+          {{input placeholder=(i18n "discourse_app_notifications.api_key_placeholder") value=subscription disabled=loading}}
+          {{d-button icon="bell-o" label="discourse_app_notifications.enable" action=(action "subscribe") disabled=disabled}}
+          {{conditional-loading-spinner size="small" condition=loading}}
+          <div class="instructions">{{{i18n "discourse_app_notifications.instructions"}}}</div>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+{{/if}}
