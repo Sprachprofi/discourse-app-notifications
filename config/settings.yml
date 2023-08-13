@@ -4,3 +4,5 @@ plugins:
     client: true
   app_notifications_api_key:
     default: ''
+  app_notifications_google_json:
+    default: ''

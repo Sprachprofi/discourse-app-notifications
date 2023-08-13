@@ -1,4 +1,4 @@
-# [discourse-app-notifications]
+# discourse-app-notifications
 Plugin for having Discourse deliver push notifications to your custom iOS/Android app through Firebase.
 
 This assumes you have a custom app that includes access to your Discourse forum. It won't work without such an app. If you don't have an app, try Discourse Pushover Notifications instead.

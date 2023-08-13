@@ -2,6 +2,7 @@ en:
   site_settings:
     app_notifications_enabled: Enable app notifications?
     app_notifications_api_key: Your Firebase key
+    app_notifications_google_json: Complete content of json file
   discourse_app_notifications:
     confirm_title: 'App Notifications - %{site_title}'
     confirm_body: 'App notifications have been enabled!'
