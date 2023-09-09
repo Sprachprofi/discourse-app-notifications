@@ -7,6 +7,7 @@
 # url: https://github.com/sprachprofi/discourse-app-notifications
 
 enabled_site_setting :app_notifications_enabled
+gem 'googleauth', '1.7.0'
 gem 'fcm', '1.0.8'
 
 after_initialize do
