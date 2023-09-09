@@ -7,6 +7,7 @@
 # url: https://github.com/sprachprofi/discourse-app-notifications
 
 enabled_site_setting :app_notifications_enabled
+gem 'memoist', '0.16.2'
 gem 'googleauth', '1.7.0'
 gem 'fcm', '1.0.8'
 
