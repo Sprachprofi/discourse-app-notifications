@@ -13,11 +13,9 @@ module DiscourseAppNotifications
           username: payload[:username]
         ),
         message: payload[:excerpt],
-        url: "#{Discourse.base_url}/#{payload[:post_url]}",
-        token: SiteSetting.app_notifications_api_key,
-        user: user.custom_fields[DiscourseAppNotifications::PLUGIN_NAME]
+        url: "#{Discourse.base_url}/#{payload[:post_url]}"
       }
-      self.pushover(user, message)
+      self.send_notification(user, message)
     end
 
     def self.confirm_subscribe(user)
@@ -27,11 +25,9 @@ module DiscourseAppNotifications
           site_title: SiteSetting.title,
         ),
         message: I18n.t("discourse_app_notifications.confirm_body"),
-        url: "#{Discourse.base_url}",
-        token: SiteSetting.app_notifications_api_key,
-        user: user.custom_fields[DiscourseAppNotifications::PLUGIN_NAME]
+        url: "#{Discourse.base_url}"
       }
-      self.pushover(user, message)
+      self.send_notification(user, message)
     end
 
     def self.subscribe(user, subscription)
@@ -46,21 +42,59 @@ module DiscourseAppNotifications
 
     private
 
-    def self.pushover(user, message)
-      url = URI.parse("https://api.pushover.net/1/messages.json")
-      req = Net::HTTP::Post.new(url.path)
-      req.set_form_data(message)
-      res = Net::HTTP.new(url.host, url.port)
-      res.use_ssl = true
-      res.verify_mode = OpenSSL::SSL::VERIFY_PEER
-      response = res.start do |http|
-        response = http.request(req)
+    def self.send_notification(user, message_hash)
+      filename = "gcp_key.json"
+      if !File.exists?(filename) and SiteSetting.app_notifications_google_json
+        File.open(filename, 'w') { |file| file.write(SiteSetting.app_notifications_google_json) }
       end
-      if response.code.to_i != 200
-        self.unsubscribe user
+      raise "Error: Missing google json for push notifications" unless File.exists?(filename)
+      
+		  fcm = FCM.new(SiteSetting.app_notifications_api_key, filename, SiteSetting.app_notifications_project_id)
+
+      message = {
+        'token': user.custom_fields[DiscourseAppNotifications::PLUGIN_NAME],
+        'data': {
+          "linked_obj_type" => 'link',
+          "linked_obj_data" => message_hash[:url],
+        },
+        'notification': {
+          title: message_hash[:title],
+          body: message_hash[:message],
+        },
+        'android': {
+          "priority": "normal",
+        },
+        'apns': {
+          headers:{
+            "apns-priority":"5"
+          },
+          payload: {
+            aps: {
+              "category": "#{Time.zone.now.to_i}",
+              "sound": "default",
+              "interruption-level": "active"
+            }
+          },
+        },
+        'fcm_options': {
+          "analytics_label": "Label"
+        }
+      }
+
+      response = fcm.send_v1(message)
+      if response[:response] == 'success'
+        return true
+      else
+        if response[:status_code] == 400
+          Rails.logger.error "ERROR: push notification was malformed. " + response[:body].to_s
+        elsif response[:status_code] == 404
+          self.unsubscribe user
+        else 
+          Rails.logger.error "ERROR: something was wrong with the push notification, code #{response[:status_code]}. Body: " + response[:body].to_s
+        end
         return false
-      end
-      return true
+      end      
     end
+
   end
 end

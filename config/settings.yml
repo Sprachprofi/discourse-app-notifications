@@ -2,6 +2,8 @@ plugins:
   app_notifications_enabled:
     default: false
     client: true
+  app_notifications_project_id:
+    default: ''
   app_notifications_api_key:
     default: ''
   app_notifications_google_json:

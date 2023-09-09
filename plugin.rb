@@ -7,6 +7,7 @@
 # url: https://github.com/sprachprofi/discourse-app-notifications
 
 enabled_site_setting :app_notifications_enabled
+gem 'fcm', '>= 1.0.0', {require: false }
 
 after_initialize do
   module ::DiscourseAppNotifications
