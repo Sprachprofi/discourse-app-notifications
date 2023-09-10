@@ -44,10 +44,10 @@ module DiscourseAppNotifications
 
     def self.send_notification(user, message_hash)
       filename = "gcp_key.json"
-      if !File.exists?(filename) and SiteSetting.app_notifications_google_json
+      if !File.exist?(filename) and SiteSetting.app_notifications_google_json
         File.open(filename, 'w') { |file| file.write(SiteSetting.app_notifications_google_json) }
       end
-      raise "Error: Missing google json for push notifications" unless File.exists?(filename)
+      raise "Error: Missing google json for push notifications" unless File.exist?(filename)
       
 		  fcm = FCM.new(SiteSetting.app_notifications_api_key, filename, SiteSetting.app_notifications_project_id)
 
