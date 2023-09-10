@@ -29,6 +29,7 @@ after_initialize do
   allow_staff_user_custom_field DiscourseAppNotifications::PLUGIN_NAME
 
   DiscourseAppNotifications::Engine.routes.draw do
+    get '/automatic_subscribe' => 'push#automatic_subscribe'
     post '/subscribe' => 'push#subscribe'
     post '/unsubscribe' => 'push#unsubscribe'
   end
@@ -45,6 +46,16 @@ after_initialize do
     before_action :ensure_logged_in
     skip_before_action :preload_json
 
+    def automatic_subscribe
+      DiscourseAppNotifications::Pusher.subscribe(current_user, params[:token])
+      if DiscourseAppNotifications::Pusher.confirm_subscribe(current_user)
+        flash.now[:notice] = "You have successfully subscribed to push notifications."
+      else
+        flash.now[:alert] = "There was an error subscribing to push notifications."
+      end
+      redirect_to '/'
+    end
+    
     def subscribe
       DiscourseAppNotifications::Pusher.subscribe(current_user, push_params)
       if DiscourseAppNotifications::Pusher.confirm_subscribe(current_user)
