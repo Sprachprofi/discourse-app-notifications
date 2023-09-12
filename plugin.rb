@@ -49,11 +49,13 @@ after_initialize do
     def automatic_subscribe
       DiscourseAppNotifications::Pusher.subscribe(current_user, params[:token])
       if DiscourseAppNotifications::Pusher.confirm_subscribe(current_user)
-        flash.now[:notice] = "You have successfully subscribed to push notifications."
+        #flash.now[:notice] = "You have successfully subscribed to push notifications."
+        render json: success_json
       else
-        flash.now[:alert] = "There was an error subscribing to push notifications."
+        #flash.now[:alert] = "There was an error subscribing to push notifications."
+        render json: { failed: 'FAILED', error: I18n.t("discourse_app_notifications.subscribe_error") }
       end
-      redirect_to '/'
+      #redirect_to '/'
     end
     
     def subscribe
@@ -77,7 +79,7 @@ after_initialize do
     end
   end
 
-  DiscourseEvent.on(:post_notification_alert) do |user, payload|
+  DiscourseEvent.on(:push_notification) do |user, payload|
     if SiteSetting.app_notifications_enabled?
       Jobs.enqueue(:send_app_notifications, user_id: user.id, payload: payload)
     end
