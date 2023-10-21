@@ -1,7 +1,7 @@
 en:
   js:
     discourse_app_notifications:
-      title: "Appr Notifications"
+      title: "App Notifications"
       disable: "Disable App Notifications"
       enable: "Enable App Notifications"
       api_key_placeholder: "Enter your device key"
